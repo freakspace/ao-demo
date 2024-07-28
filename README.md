@@ -48,6 +48,6 @@ python manage.py add_test_data
 
 ### Start the webapp
 ```
-python manage.py run server
+python manage.py runserver
 ```
 
