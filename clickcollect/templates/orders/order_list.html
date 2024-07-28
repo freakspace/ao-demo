@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+<div class="container">
+    <h1>{% translate 'Orders' %}</h1>
+    <form method="post" action="."> 
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">{% translate 'Create test order '%}</button>
+    </form>
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th scope="col">{% translate 'Order ID' %}</th>
+                <th scope="col">{% translate 'Customer' %}</th>
+                <th scope="col">{% translate 'Created' %}</th>
+                <th scope="col">{% translate 'Total (excl. tax)' %}</th>
+                <th scope="col">{% translate 'Location' %}</th>
+                <th scope="col">{% translate 'Status' %}</th>
+                <th scope="col">{% translate 'Action' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in object_list %}
+            <tr>
+                <th scope="row">{{ order.pk }}</th>
+                <td>{{ order.customer }}</td>
+                <td>{{ order.created }}</td>
+                <td>{{ order.total_excl_tax }}</td>
+                <td>{{ order.location }}</td>
+                <td>{{ order.order_status }}</td>
+                <td><a type="button" class="btn btn-sm btn-secondary" href="{% url 'orders:order_detail' pk=order.pk %}">{% translate 'View' %}</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

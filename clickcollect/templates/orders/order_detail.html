@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'orders:order_list' %}">{% translate 'Go back' %}</a>
+    <h1 class="mb-4">{% translate 'Order' %} {{order.pk}}</h1>
+    {% if order.order_status == 'Collected' %}
+    <div class="alert alert-success">
+        <p class="mb-0">{% translate 'This order has been picked up' %}</p>
+    </div>
+    {% elif order.is_ready_for_pickup %}
+    <div class="alert alert-warning">
+        <p>{% translate 'This order is ready for pickup' %}</p>
+        <form method="POST" action=".">
+            {% csrf_token %}
+            <input type="hidden" name="collected" value="true">
+            <button type="submit" class="btn btn-primary">{% translate 'Customer has collected' %}</button>
+        </form>
+    </div>
+    {% endif %}
+    <h3 class="fw-bolder">{% translate 'Customer details' %}</h3>
+    <table class="table table-bordered mb-5">
+        <tbody>
+            <tr>
+                <th scope="row">{% translate 'Name' %}</th>
+                <td>{{ order.customer.name }}</td>
+            </tr>
+            <tr>
+                <th scope="row">{% translate 'Email' %}</th>
+                <td>{{ order.customer.email }}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3 class="fw-bolder">{% translate 'Order details' %}</h3>
+    <table class="table table-striped mb-5">
+        <thead>
+            <tr>
+                <th scope="col">{% translate 'Name' %}</th>
+                <th scope="col">{% translate 'SKU' %}</th>
+                <th scope="col">{% translate 'Quantity' %}</th>
+                <th scope="col">{% translate 'In stock' %}</th>
+                <th scope="col">{% translate 'Unit Price' %}</th>
+                <th scope="col">{% translate 'Unit Total' %}</th>
+                <th scope="col">{% translate 'Collected' %}</th>
+                <th scope="col">{% translate 'Action' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in order.lines.all %}
+            <tr>
+                <td>{{ line.product.name }}</td>
+                <td>{{ line.product.sku }}</td>
+                <td>{{ line.quantity }}</td>
+                <td>{{ line.in_stock }}</td>
+                <td>{{ line.unit_price }}</td>
+                <td>{{ line.total }}</td>
+                <td>{% if line.received %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2 text-success" viewBox="0 0 16 16">
+                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
+                      </svg>{% else %}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg text-danger fw-bolder" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                      </svg>{% endif %}</td>
+                <td>
+                    {% if not line.received %}
+                    <form method="POST" action=".">
+                        {% csrf_token %}
+                        <input type="hidden" name="line_id" value="{{ line.id }}">
+                        <button type="submit" class="btn btn-primary">{% translate 'Collect' %}</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="fw-bolder">
+                <td colspan="4">{% translate 'Total' %}</td>
+                <td>{{ order.total_excl_tax }}</td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
+    </table>
+    <!-- Logs -->
+    {% if order.logs.count > 0 %}
+    <h3 class="fw-bolder">{% translate 'Order Logs' %}</h3>
+    <table class="table table-striped mb-5">
+        <thead>
+            <tr>
+                <th scope="col">{% translate 'ID' %}</th>
+                <th scope="col">{% translate 'Message' %}</th>
+                <th scope="col">{% translate 'Created' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in order.logs.all %}
+            <tr>
+                <td>{{ log.pk }}</td>
+                <td>{{ log.message }}</td>
+                <td>{{ log.created }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>{% translate 'No logs' %}</p>
+    {% endif %}
+    
+</div>
+{% endblock content %}
