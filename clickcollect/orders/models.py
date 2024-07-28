@@ -14,8 +14,10 @@ ORDERSTATUS = (
 )
 
 
-# TODO Tilføj varenummer
 class Order(models.Model):
+
+    class Meta:
+        ordering = ["-created"]
 
     customer = models.ForeignKey(
         Customer,
