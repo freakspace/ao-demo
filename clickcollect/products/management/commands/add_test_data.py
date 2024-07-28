@@ -12,19 +12,41 @@ logging.basicConfig(
 
 
 class Command(BaseCommand):
+    """Management command to add test data"""
+
     help = "Add some test data"
 
     def handle(self, *args, **options):
         Customer.objects.create(name="Test Customer", email="test@test.com")
 
-        product = Product.objects.create(
+        product_1 = Product.objects.create(
             name="Test Product 1",
             unit_price=100.00,
-            sku="GG_ABC",
+            sku="ABC",
+        )
+
+        product_2 = Product.objects.create(
+            name="Test Product 2",
+            unit_price=80.00,
+            sku="DEF",
+        )
+
+        product_3 = Product.objects.create(
+            name="Test Product 3",
+            unit_price=200.00,
+            sku="GHI",
         )
 
         location = StockLocation.objects.create(location="København")
 
-        StockRecord.objects.create(product=product, num_in_stock=99, location=location)
+        StockRecord.objects.create(
+            product=product_1, num_in_stock=99, location=location
+        )
+        StockRecord.objects.create(
+            product=product_2, num_in_stock=99, location=location
+        )
+        StockRecord.objects.create(
+            product=product_3, num_in_stock=99, location=location
+        )
 
         self.stdout.write(self.style.SUCCESS("Successfully added test data"))

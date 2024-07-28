@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
-from orders.models import Order, OrderLog
+from orders.models import Order, OrderLine, OrderLog
 
 from orders.utils import create_test_order
 
@@ -24,18 +24,23 @@ class OrderDetailView(DetailView):
         collected = request.POST.get("collected")
         # Mark the line as received
         if line_id:
-            line = self.object.lines.get(pk=line_id)
-            line.received = True
+            try:
 
-            OrderLog.objects.create(
-                order=self.object, message=f"Orderline ID {line_id} has been received"
-            )
+                line = self.object.lines.get(pk=line_id)
+                line.received = True
 
-            line.save()
+                OrderLog.objects.create(
+                    order=self.object,
+                    message=f"Orderline ID {line_id} has been received",
+                )
 
-            messages.success(request, _(f"Order line has been marked as received"))
+                line.save()
 
-        # Mark the order as collected
+                messages.success(request, _(f"Order line has been marked as received"))
+            except OrderLine.DoesNotExist:
+                messages.warning(request, _(f"An orderline with that id was not found"))
+
+        # Mark the order as collected and deduct stock
         elif collected:
             self.object.order_status = "Collected"
             self.object.save()

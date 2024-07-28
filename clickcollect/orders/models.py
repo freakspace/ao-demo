@@ -52,9 +52,11 @@ class Order(models.Model):
         return f"Order ID {self.pk} ({self.customer} - {self.created})"
 
     def is_ready_for_pickup(self):
+        """Check if all order lines are received"""
         return all(self.lines.values_list("received", flat=True))
 
     def deduct_stock(self):
+        """Deduct stock from the location"""
         for line in self.lines.filter(received=True):
             record = line.product.stock_records.get(location=self.location)
             record.num_in_stock -= line.quantity
@@ -93,9 +95,11 @@ class OrderLine(models.Model):
         return f"Orderline ID {self.pk} ({self.quantity}x {self.title})"
 
     def total(self):
+        """Return the total price for the line"""
         return self.quantity * self.unit_price
 
     def in_stock(self):
+        """Return the number of items in stock for the product"""
         return self.product.stock_records.get(location=self.order.location).num_in_stock
 
 
