@@ -33,7 +33,7 @@ class OrderDetailView(DetailView):
 
             line.save()
 
-            messages.success(request, _(f"Order line has been marked as collected"))
+            messages.success(request, _(f"Order line has been marked as received"))
 
         # Mark the order as collected
         elif collected:

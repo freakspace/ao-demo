@@ -11,30 +11,43 @@ This is a demo project for a click and collect webapp
 ### Installation
 
 1. Clone the repository to your local machine:
-    ```
-    git clone git@github.com:freakspace/ao-demo.git
-    cd ao-demo
-    ```
+```
+git clone git@github.com:freakspace/ao-demo.git
+```
+
+```
+cd ao-demo
+```
 
 2. Install the required Python packages:
-    ```
-    python -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-    ```
+```
+python -m venv venv
+```
+
+```
+source venv/bin/activate
+```
+
+```
+pip install -r requirements.txt
+```
 
 ### Prepare the webapp
-    ```
-    cd clickcollect
+```
+cd clickcollect
+```
 
-    python manage.py migrate
+```
+python manage.py migrate
+```
 
-    python manage.py add_data
-    ```
+```
+python manage.py add_test_data
+```
 
 
 ### Start the webapp
-    ```
-    python manage.py run server
-    ```
+```
+python manage.py run server
+```
 

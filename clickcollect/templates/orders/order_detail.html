@@ -4,6 +4,7 @@
 <div class="container mt-5">
     <a href="{% url 'orders:order_list' %}">{% translate 'Go back' %}</a>
     <h1 class="mb-4">{% translate 'Order' %} {{order.pk}}</h1>
+    <p>{% translate 'Status' %}: <span class="fw-bolder">{{order.order_status}}</span></p>
     {% if order.order_status == 'Collected' %}
     <div class="alert alert-success">
         <p class="mb-0">{% translate 'This order has been picked up' %}</p>
