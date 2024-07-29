@@ -24,37 +24,43 @@ class OrderDetailView(DetailView):
         collected = request.POST.get("collected")
         # Mark the line as received
         if line_id:
-            try:
-
-                line = self.object.lines.get(pk=line_id)
-                line.received = True
-
-                OrderLog.objects.create(
-                    order=self.object,
-                    message=f"Orderline ID {line_id} has been received",
-                )
-
-                line.save()
-
-                messages.success(request, _(f"Order line has been marked as received"))
-            except OrderLine.DoesNotExist:
-                messages.warning(request, _(f"An orderline with that id was not found"))
-
+            self.handle_line(line_id)
         # Mark the order as collected and deduct stock
         elif collected:
-            self.object.order_status = "Collected"
-            self.object.save()
-            OrderLog.objects.create(
-                order=self.object,
-                message=f"Order ID { self.object.pk} has been collected by customer",
-            )
-
-            self.object.deduct_stock()
-
-            messages.success(request, _(f"Order has been marked as collected"))
+            self.handle_collected(collected)
         else:
             messages.warning(request, _(f"No action was taken"))
         return redirect("orders:order_detail", pk=self.object.pk)
+
+    def handle_line(self, line_id: int):
+        try:
+            line = self.object.lines.get(pk=line_id)
+            line.received = True
+
+            OrderLog.objects.create(
+                order=self.object,
+                message=f"Orderline ID {line_id} has been received",
+            )
+
+            line.save()
+
+            messages.success(self.request, _(f"Order line has been marked as received"))
+        except OrderLine.DoesNotExist:
+            messages.warning(
+                self.request, _(f"An orderline with that id was not found")
+            )
+
+    def handle_collected(self, collected: bool):
+        self.object.order_status = "Collected"
+        self.object.save()
+        OrderLog.objects.create(
+            order=self.object,
+            message=f"Order ID { self.object.pk} has been collected by customer",
+        )
+
+        self.object.deduct_stock()
+
+        messages.success(self.request, _(f"Order has been marked as collected"))
 
 
 class OrderListView(ListView):
