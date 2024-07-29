@@ -63,6 +63,7 @@ class Order(models.Model):
             record.save()
 
     def log_action(self, message: str):
+        """Log an action for the order"""
         OrderLog.objects.create(order=self, message=message)
 
 
