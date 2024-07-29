@@ -27,20 +27,18 @@ class OrderDetailView(DetailView):
             self.handle_line(line_id)
         # Mark the order as collected and deduct stock
         elif collected:
-            self.handle_collected(collected)
+            self.handle_collected()
         else:
             messages.warning(request, _(f"No action was taken"))
         return redirect("orders:order_detail", pk=self.object.pk)
 
     def handle_line(self, line_id: int):
+        """Handle when a line is marked as received"""
         try:
             line = self.object.lines.get(pk=line_id)
             line.received = True
 
-            OrderLog.objects.create(
-                order=self.object,
-                message=f"Orderline ID {line_id} has been received",
-            )
+            self.object.log_action(f"Orderline ID {line_id} has been received")
 
             line.save()
 
@@ -50,12 +48,13 @@ class OrderDetailView(DetailView):
                 self.request, _(f"An orderline with that id was not found")
             )
 
-    def handle_collected(self, collected: bool):
+    def handle_collected(self):
+        """Handle when the customer has picked up the order"""
         self.object.order_status = "Collected"
         self.object.save()
-        OrderLog.objects.create(
-            order=self.object,
-            message=f"Order ID { self.object.pk} has been collected by customer",
+
+        self.object.log_action(
+            f"Order ID { self.object.pk} has been collected by customer"
         )
 
         self.object.deduct_stock()
@@ -71,7 +70,7 @@ class OrderListView(ListView):
         order = create_test_order()
 
         if order:
-            OrderLog.objects.create(order=order, message="Order has been created")
+            order.log_action(f"Order ID {order.pk} has been created")
 
             messages.success(
                 request, _(f"A test order id {order.pk} has been created.")

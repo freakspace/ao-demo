@@ -15,8 +15,7 @@ def check_order_lines_send_email(sender, instance, **kwargs):
             # TODO Send email to customer
             print("Email sent to customer")
             # Log the email sending event
-            OrderLog.objects.create(order=order, message="Email sent")
-
+            order.log_action("Email sent")
             # Mark order as Ready for customer pickup
             order.order_status = "Ready"
             order.save()

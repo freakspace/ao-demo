@@ -62,6 +62,9 @@ class Order(models.Model):
             record.num_in_stock -= line.quantity
             record.save()
 
+    def log_action(self, message: str):
+        OrderLog.objects.create(order=self, message=message)
+
 
 class OrderLine(models.Model):
     order = models.ForeignKey(
